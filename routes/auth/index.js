@@ -1,13 +1,10 @@
-const express = require('express');
 const jwt = require('jsonwebtoken');
 
 const hash = require('../../helpers/hash');
 const settings = require('../../settings');
 const UserModel = require('../../models/user.model');
 
-const router = express.Router();
-
-router.post('/signUp', (req, res) => {
+const signUp =  (req, res) => {
     const body = req.body;
     const masterPassword = body.masterPassword;
     if (!masterPassword) {
@@ -60,9 +57,9 @@ router.post('/signUp', (req, res) => {
             });
         }
     }
-});
+};
 
-router.post('/signIn', (req, res) => {
+const signIn = (req, res) => {
     const body = req.body;
     if (!body.username) {
         res.status(400).json({
@@ -112,6 +109,9 @@ router.post('/signIn', (req, res) => {
             }
         });   
     }
-});
+};
 
-module.exports = router;
+module.exports = {
+    signUp,
+    signIn
+};
