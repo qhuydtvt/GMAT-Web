@@ -13,7 +13,7 @@ const authRouter = require('./routes/auth');
 const settings = require('./settings');
 const hash = require('./helpers/hash');
 
-const app = express();
+let app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -51,7 +51,9 @@ mongoose.connect(settings.dbUri, (err) => {
   console.log('DB connect success!');
 });
 
-app.listen(settings.port, (err) => {
+let port = process.env.PORT || settings.port;
+
+app.listen(port, (err) => {
   if(err) console.log(err);
-  console.log(`App is listen at ${settings.port}`);
+  console.log(`App is listen at ${port}`);
 });
