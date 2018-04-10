@@ -11,4 +11,6 @@ router.post('/signup', auth.signUp);
 
 router.post('/signin', auth.signIn);
 
+router.post('/auth', auth.checkToken);
+
 module.exports = router;
