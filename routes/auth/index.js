@@ -111,7 +111,12 @@ const signIn = (req, res) => {
                     res.json({
                         success: 1,
                         message: "Logged in succesfully!",
-                        token
+                        token,
+                        user: {
+                            username: foundUser.username,
+                            role: foundUser.role,
+                            id: foundUser._id
+                        }
                     });
                 }
             }
@@ -171,7 +176,11 @@ const isAuthenticated = (req, res, next) => {
                                 message: "Token is expired!"
                             });
                         } else {
-                            req.user = { ...user, role: foundUser.role };
+                            req.user = {
+                                username: user.username,
+                                role: foundUser.role,
+                                id: user._id
+                            };
                             next();
                         }
                     }
