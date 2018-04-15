@@ -33,7 +33,8 @@ const signUp =  (req, res) => {
         } else {
             let newUser = {
                 username: body.username,
-                hashPassword: hash.generateHash(body.password)
+                hashPassword: hash.generateHash(body.password),
+                role: body.role ? body.role : 'student'
             }
             UserModel.create(newUser, (err, createdUser) => {
                 if (err) {
@@ -118,15 +119,34 @@ const signIn = (req, res) => {
     }
 };
 
-const checkToken = (req, res) => {
+const hasRole = (roleRequired) => {
+    return (req, res, next) => {
+        if (!roleRequired) {
+            res.status(500).json({
+                success: 0,
+                message: "Must has role required!"
+            });
+        } else if (!req.user.role || req.user.role !== roleRequired) {
+            res.status(401).json({
+                success: 0,
+                message: "Forbidden!"
+            });
+        } else {
+            next();
+        }
+    }
+}
+
+const isAuthenticated = (req, res, next) => {
     const body = req.body;
-    if (!body.token) {
+    const token = body.token || req.headers.token;
+    if (!token) {
         res.status(400).json({
             success: 0,
             message: "You must provide token!"
         });
     } else {
-        jwt.verify(body.token, settings.superSecret, (err, user) => {
+        jwt.verify(token, settings.superSecret, (err, user) => {
             if (!user || typeof user._id == 'undefined' || ( typeof user._id != 'undefined' && user._id == null )) {
                 res.status(401).json({
                     success: 0,
@@ -151,16 +171,12 @@ const checkToken = (req, res) => {
                                 message: "Token is expired!"
                             });
                         } else {
-                            res.json({
-                                success: 1,
-                                message: "Auth token success!",
-                                user: user
-                            });
+                            req.user = { ...user, role: foundUser.role };
+                            next();
                         }
                     }
                 });
             }
-            console.log(user);
         });
     }
 }
@@ -168,5 +184,6 @@ const checkToken = (req, res) => {
 module.exports = {
     signUp,
     signIn,
-    checkToken
+    hasRole,
+    isAuthenticated
 };
