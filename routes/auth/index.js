@@ -144,7 +144,6 @@ const hasRole = (roleRequired) => {
 
 const isAuthenticated = (req, res, next) => {
     const body = req.body;
-    console.log(req.cookies.token)
     const token = body.token || req.headers.token || req.cookies.token || null;
     if (!token) {
         res.status(400).json({
