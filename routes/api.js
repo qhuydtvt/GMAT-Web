@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const auth = require('./auth');
+const questionRouter = require('./question');
+const questionPackRouter = require('./questionPack');
 
 router.get('/', (req, res) => {
     res.json({success: 1, message: "Api Router"});
@@ -11,7 +13,11 @@ router.post('/signup', auth.signUp);
 
 router.post('/signin', auth.signIn);
 
-router.post('/auth', auth.isAuthenticated, (req, res) => {
+router.use(auth.isAuthenticated);
+
+router.use(auth.checkPermission);
+
+router.post('/auth', (req, res) => {
     res.json({
         success: 1,
         message: "Auth success!",
@@ -19,11 +25,15 @@ router.post('/auth', auth.isAuthenticated, (req, res) => {
     });
 });
 
-router.use('/classrooms', auth.isAuthenticated, auth.hasRole("lecture"), (req, res)=>{
+router.use('/questions', questionRouter);
+
+router.use('/questionpacks', questionPackRouter);
+
+router.use('/classrooms', (req, res)=>{
     res.json({success: 1, message: "Classrooms api"});
 });
 
-router.get('/users/:id', auth.isAuthenticated, (req, res)=>{
+router.get('/users/:id', (req, res)=>{
     res.json({success: 1, message: "Students api"});
 });
 

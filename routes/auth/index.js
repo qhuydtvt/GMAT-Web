@@ -10,25 +10,25 @@ const signUp =  (req, res) => {
     if (!masterPassword) {
         res.status(400).json({
             success: 0,
-            messaage: "You must provide masterPassword!"
+            message: "You must provide masterPassword!"
         });
     }
     else if (!hash.compareHash(masterPassword, settings.masterPasswordHash)) {
         res.status(401).json({
             success: 0,
-            messaage: "Master password is invalid!"
+            message: "Master password is invalid!"
         });
     }
     else {
         if (!body.username) {
             res.status(400).json({
                 success: 0,
-                messaage: "You must provide username!"
+                message: "You must provide username!"
             });
         } else if (!body.password) {
             res.status(400).json({
                 success: 0,
-                messaage: "You must provide password!"
+                message: "You must provide password!"
             });
         } else {
             let newUser = {
@@ -40,7 +40,7 @@ const signUp =  (req, res) => {
                 if (err) {
                     res.status(500).json({
                         success: 0,
-                        messaage: "Could not create user!",
+                        message: "Could not create user!",
                         error: err
                     });
                 } else {
@@ -55,7 +55,7 @@ const signUp =  (req, res) => {
 
                     res.status(201).json({
                         success: 1,
-                        messaage: "Sign-up success!",
+                        message: "Sign-up success!",
                         token
                     });
                 }
@@ -69,26 +69,26 @@ const signIn = (req, res) => {
     if (!body.username) {
         res.status(400).json({
             success: 0,
-            messaage: "You must provide username!"
+            message: "You must provide username!"
         });
     } else if (!body.password) {
         res.status(400).json({
             success: 0,
-            messaage: "You must provide password!"
+            message: "You must provide password!"
         });
     } else {
         UserModel.findOne({ username: body.username }, (err, foundUser) => {
             if (err) {
                 res.status(500).json({
                     success: 0,
-                    messaage: "Could not find user!",
+                    message: "Could not find user!",
                     error: err
                 });
             }
             else if (!foundUser) {
                 res.status(401).json({
                     success: 0,
-                    messaage: "No such user!"
+                    message: "No such user!"
                 });
             } 
             else {
@@ -96,7 +96,7 @@ const signIn = (req, res) => {
                 if (!hash.compareHash(body.password, hashPassword)) {
                     res.status(401).json({
                         success: 0,
-                        messaage: "Wrong password!"
+                        message: "Wrong password!"
                     });
                 } else {
                     let now = new Date();
@@ -123,24 +123,6 @@ const signIn = (req, res) => {
         });   
     }
 };
-
-const hasRole = (roleRequired) => {
-    return (req, res, next) => {
-        if (!roleRequired) {
-            res.status(500).json({
-                success: 0,
-                message: "Must has role required!"
-            });
-        } else if (!req.user.role || req.user.role !== roleRequired) {
-            res.status(401).json({
-                success: 0,
-                message: "Forbidden!"
-            });
-        } else {
-            next();
-        }
-    }
-}
 
 const isAuthenticated = (req, res, next) => {
     const body = req.body;
@@ -190,9 +172,48 @@ const isAuthenticated = (req, res, next) => {
     }
 }
 
+const checkPermission = (req, res, next) => {
+    if(!req.user.role) {
+        res.status(500).json({
+            success: 0,
+            message: "Must has role required!"
+        });
+    } else {
+        let urlPath = req.url.slice(1);
+        let apiModule = urlPath.indexOf('/') > -1 ? urlPath.slice(0, urlPath.indexOf('/')) : urlPath;
+        var userRoleLevel;
+        switch(req.user.role) {
+            case "lecture":
+                userRoleLevel = 2;
+                break;
+            case "student":
+                userRoleLevel = 1;
+                break;
+            default:
+                userRoleLevel = 0;
+                break;
+        };
+        if(Object.keys(settings.permission).indexOf(apiModule) > -1) {
+            if(settings.permission[apiModule] <= userRoleLevel) {
+                next();
+            } else {
+                res.status(401).json({
+                    success: 0,
+                    message: "Forbidden!"
+                });
+            }
+        } else {
+            res.status(500).json({
+                success: 0,
+                message: "Permission denied!"
+            });
+        }
+    }
+}
+
 module.exports = {
     signUp,
     signIn,
-    hasRole,
-    isAuthenticated
+    isAuthenticated,
+    checkPermission
 };
