@@ -3,8 +3,9 @@ const Schema = mongoose.Schema;
 
 let QuestionPackSchema = new Schema({
     name: { type: String, required: true },
-    questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }]
-},{
+    questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
+    unlock: { type: Boolean, default: false }
+}, {
     timestamps: true
 });
 

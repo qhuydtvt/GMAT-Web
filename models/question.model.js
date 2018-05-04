@@ -17,7 +17,7 @@ let QuestionSchema = new Schema({
         validate: [arrayLimit, '{PATH} exceeds the limit of 5']
     },
     correct: { type: Number, default: 0 }
-},{
+}, {
     timestamps: true
 });
 
