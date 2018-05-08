@@ -173,43 +173,42 @@ const isAuthenticated = (req, res, next) => {
 }
 
 const checkPermission = (req, res, next) => {
-    next();
-    // if(!req.user.role) {
-    //     res.status(500).json({
-    //         success: 0,
-    //         message: "Must has role required!"
-    //     });
-    // } else {
-    //     let urlPath = req.url.slice(1);
-    //     let apiModule = urlPath.indexOf('/') > -1 ? urlPath.slice(0, urlPath.indexOf('/')) : urlPath;
-    //     var userRoleLevel;
-    //     switch(req.user.role) {
-    //         case "lecture":
-    //             userRoleLevel = 2;
-    //             break;
-    //         case "student":
-    //             userRoleLevel = 1;
-    //             break;
-    //         default:
-    //             userRoleLevel = 0;
-    //             break;
-    //     };
-    //     if(Object.keys(settings.permission).indexOf(apiModule) > -1) {
-    //         if(settings.permission[apiModule] <= userRoleLevel) {
-    //             next();
-    //         } else {
-    //             res.status(401).json({
-    //                 success: 0,
-    //                 message: "Forbidden!"
-    //             });
-    //         }
-    //     } else {
-    //         res.status(500).json({
-    //             success: 0,
-    //             message: "Permission denied!"
-    //         });
-    //     }
-    // }
+    if(!req.user.role) {
+        res.status(500).json({
+            success: 0,
+            message: "Must has role required!"
+        });
+    } else {
+        let urlPath = req.url.slice(1);
+        let apiModule = urlPath.indexOf('/') > -1 ? urlPath.slice(0, urlPath.indexOf('/')) : urlPath;
+        var userRoleLevel;
+        switch(req.user.role) {
+            case "lecture":
+                userRoleLevel = 2;
+                break;
+            case "student":
+                userRoleLevel = 1;
+                break;
+            default:
+                userRoleLevel = 0;
+                break;
+        };
+        if(Object.keys(settings.permission).indexOf(apiModule) > -1) {
+            if(settings.permission[apiModule] <= userRoleLevel) {
+                next();
+            } else {
+                res.status(401).json({
+                    success: 0,
+                    message: "Forbidden!"
+                });
+            }
+        } else {
+            res.status(500).json({
+                success: 0,
+                message: "Permission denied!"
+            });
+        }
+    }
 }
 
 module.exports = {
