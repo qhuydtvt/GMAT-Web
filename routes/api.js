@@ -5,6 +5,7 @@ const auth = require('./auth');
 const questionRouter = require('./question');
 const questionPackRouter = require('./questionPack');
 const classroomRouter = require('./classroom');
+const resultRouter = require('./result');
 
 router.get('/', (req, res) => {
     res.json({success: 1, message: "Api Router"});
@@ -31,6 +32,8 @@ router.use('/questions', questionRouter);
 router.use('/questionpacks', questionPackRouter);
 
 router.use('/classrooms', classroomRouter);
+
+router.use('/results', resultRouter);
 
 router.get('/users/:id', (req, res)=>{
     res.json({success: 1, message: "Students api"});

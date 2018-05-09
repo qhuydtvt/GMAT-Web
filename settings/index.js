@@ -7,7 +7,23 @@ module.exports = {
         auth: '1',
         classrooms: '2',
         users: '1',
-        questions: '2',
-        questionpacks: '2'
+        questions: {
+            GET: '2',
+            PUT: '2',
+            POST: '2',
+            DELETE: '2'
+        },
+        questionpacks: {
+            GET: '1',
+            PUT: '2',
+            POST: '2',
+            DELETE: '2'
+        },
+        results: {
+            GET: '1',
+            PUT: '2',
+            POST: '1',
+            DELETE: '2'
+        }
     }
 }

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Question = require('../models/question.model');
+const QuestionPack = require('../models/questionPack.model');
 
 router.get('/', (req, res)=>{
     Question.find({}, (err, questions)=>{
@@ -61,14 +62,19 @@ router.put('/:id', (req, res)=>{
 
 router.delete('/:id', (req, res)=>{
     if(req.params.id) {
-        let id = req.params.id;
-        Question.findById(id, (err, questionFound) => {
+        let questionId = req.params.id;
+        Question.findById(questionId, (err, questionFound) => {
             if(err) res.status(500).json({ success: 0, message: 'Could not get question', errMsg: err })
             else if(!questionFound) res.status(400).json({ success: 0, message: 'Question not exist!' })
             else {
-                Question.remove({ _id: id }, (err)=>{
-                    if(err) res.status(500).json({ success: 0, message: 'Could not remove question', errMsg: err })
-                    else res.json({ success: 1, message: 'Remove success!' });
+                QuestionPack.update({ questions: questionId }, { $pullAll: { questions: [ questionId ] }}, (err, numAffected) => {
+                    if(err) res.status(500).json({ success: 0, message: 'Could not remove question from question pack', errMsg: err })
+                    else {
+                        Question.remove({ _id: questionId }, (err)=>{
+                            if(err) res.status(500).json({ success: 0, message: 'Could not remove question', errMsg: err })
+                            else res.json({ success: 1, message: 'Remove success!' });
+                        });
+                    }
                 });
             }
         });

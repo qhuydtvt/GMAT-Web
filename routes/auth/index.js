@@ -194,7 +194,7 @@ const checkPermission = (req, res, next) => {
                 break;
         };
         if(Object.keys(settings.permission).indexOf(apiModule) > -1) {
-            if(settings.permission[apiModule] <= userRoleLevel) {
+            if(settings.permission[apiModule][req.method] <= userRoleLevel) {
                 next();
             } else {
                 res.status(401).json({
