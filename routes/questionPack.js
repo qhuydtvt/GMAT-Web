@@ -50,7 +50,7 @@ router.put('/:id', (req, res)=>{
                 }
                 questionPackFound.save((err, questionPackUpdated)=>{
                     if(err) res.status(500).json({ success: 0, message: 'Could not update question pack!', errMsg: err })
-                    else res.json({ success: 1, message: 'Update success!' });
+                    else res.json({ success: 1, message: 'Update success!', questionPack: questionPackUpdated });
                 });
             }
         });
