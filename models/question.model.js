@@ -5,7 +5,7 @@ let QuestionSchema = new Schema({
     stimulus: { type: String, required: true },
     stem: { type: String, required: true },
     type: { type: String, default: '' },
-    level: { type: Number, default: 0 },
+    difficulty: { type: Number, default: 0 },
     choices: {
         type: [
             { type: String, default: '' },
@@ -16,7 +16,7 @@ let QuestionSchema = new Schema({
         ],
         validate: [arrayLimit, '{PATH} exceeds the limit of 5']
     },
-    correct: { type: Number, default: 0 }
+    rightChoice: { type: Number, default: 0 }
 }, {
     timestamps: true
 });

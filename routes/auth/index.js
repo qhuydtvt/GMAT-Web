@@ -205,7 +205,7 @@ const checkPermission = (req, res, next) => {
         } else {
             res.status(500).json({
                 success: 0,
-                message: "Permission denied!"
+                message: "Incorrect URL!"
             });
         }
     }
