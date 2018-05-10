@@ -45,7 +45,7 @@ router.put('/:id', (req, res)=>{
                   break;
           }
         }
-        Quesiton.findByIdAndUpdate(id, questionToUpdate, (err, updatedQuestion) => {
+        Question.findByIdAndUpdate(id, questionToUpdate, (err, updatedQuestion) => {
           if(err) res.status(500).json({ success: 0, message: 'Could not update question', error: err })
           else res.json({ success: 1, message: 'Update success!', question: updatedQuestion });
         });
