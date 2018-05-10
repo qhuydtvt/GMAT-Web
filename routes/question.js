@@ -49,7 +49,7 @@ router.put('/:id', (req, res)=>{
                             break;
                     }
                 }
-                questionFound.save((err, questionUpdated)=>{
+                Question.update({_id: id}, questionFound, (err, questionUpdated)=>{
                     if(err) res.status(500).json({ success: 0, message: 'Could not update question', errMsg: err })
                     else res.json({ success: 1, message: 'Update success!', question: questionUpdated });
                 });
