@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let QuestionSchema = new Schema({
-    stimulus: { type: String, required: true },
-    stem: { type: String, required: true },
+    stimulus: { type: String },
+    stem: { type: String },
     type: { type: String, default: '' },
     difficulty: { type: Number, default: 0 },
     choices: {
