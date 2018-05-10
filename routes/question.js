@@ -44,10 +44,10 @@ router.put('/:id', (req, res)=>{
                 for(key in body) {
                     switch(key) {
                         case '_id':
-                            break;
+                          break;
                         default:
-                            if(questionFound[key]) questionFound[key] = body[key];
-                            break;
+                          questionFound[key] = body[key];
+                          break;
                     }
                 }
                 questionFound.save((err, questionUpdated)=>{
