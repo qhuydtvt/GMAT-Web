@@ -13,7 +13,7 @@ router.get('/', (req, res)=>{
 router.get('/:id', (req, res)=>{
     if(req.params.id) {
         let id = req.params.id;
-        QuestionPack.findById(id).populate('questions', `stimulus stem type difficulty choices ${ req.user.role === 'student' ? '' : 'rightChoice' }`).exec((err, questionPackFound) => {
+        QuestionPack.findById(id).populate('questions', `stimulus stem type difficulty choices rightChoice`).exec((err, questionPackFound) => {
             if(err) res.status(500).json({ success: 0, message: 'Could not get question pack', errMsg: err })
             else if(!questionPackFound) res.status(400).json({ success: 0, message: 'Question pack not exist!' })
             else res.json({ success: 1, message: 'Success!', questionPack: questionPackFound });
