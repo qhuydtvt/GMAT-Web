@@ -6,6 +6,7 @@ let QuestionSchema = new Schema({
     stem: { type: String },
     type: { type: String, default: '' },
     difficulty: { type: Number, default: 0 },
+    explanation: { type: String },
     choices: {
         type: [
             { type: String, default: '' },
