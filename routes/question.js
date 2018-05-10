@@ -36,25 +36,39 @@ router.put('/:id', (req, res)=>{
     if(req.params.id) {
         let id = req.params.id;
         let body = req.body;
-        Question.findById(id, (err, questionFound) => {
-            if(err) res.status(500).json({ success: 0, message: 'Could not get question', errMsg: err })
-            else if(!questionFound) res.status(400).json({ success: 0, message: 'Question not exist!' })
-            else {
-                for(key in body) {
-                    switch(key) {
-                        case '_id':
-                            break;
-                        default:
-                            if(questionFound[key]) questionFound[key] = body[key];
-                            break;
-                    }
-                }
-                Question.update({_id: id}, questionFound, (err, questionUpdated)=>{
-                    if(err) res.status(500).json({ success: 0, message: 'Could not update question', errMsg: err })
-                    else res.json({ success: 1, message: 'Update success!', question: questionUpdated });
-                });
-            }
+        var questionToUpdate = {};
+        for(key in body) {
+          switch(key) {
+              case "_id": break;
+              default:
+                  questionToUpdate[key] = body[key];
+                  break;
+          }
+        }
+        Quesiton.findByIdAndUpdate(id, questionToUpdate, (err, updatedQuestion) => {
+          if(err) res.status(500).json({ success: 0, message: 'Could not update question', error: err })
+          else res.json({ success: 1, message: 'Update success!', question: updatedQuestion });
         });
+
+        // Question.findById(id, (err, questionFound) => {
+        //     if(err) res.status(500).json({ success: 0, message: 'Could not get question', errMsg: err })
+        //     else if(!questionFound) res.status(400).json({ success: 0, message: 'Question not exist!' })
+        //     else {
+        //         for(key in body) {
+        //             switch(key) {
+        //                 case '_id':
+        //                     break;
+        //                 default:
+        //                     if(questionFound[key]) questionFound[key] = body[key];
+        //                     break;
+        //             }
+        //         }
+        //         Question.update({_id: id}, questionFound, (err, questionUpdated)=>{
+        //             if(err) res.status(500).json({ success: 0, message: 'Could not update question', errMsg: err })
+        //             else res.json({ success: 1, message: 'Update success!', question: questionUpdated });
+        //         });
+        //     }
+        // });
     } else {
         res.status(400).json({ success: 0, message: 'You must provide question id!' });
     }
