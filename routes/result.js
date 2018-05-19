@@ -13,7 +13,7 @@ router.get('/', (req, res)=>{
 router.get('/:id', (req, res)=>{
     if(req.params.id) {
         let id = req.params.id;
-        Result.findById(id).populate('questionPack', 'name').populate('answers.question').exec((err, resultFound) => {
+        Result.findById(id).populate('questionPack', 'name').populate('answers.question', 'difficulty type rightChoice').exec((err, resultFound) => {
             if(err) res.status(500).json({ success: 0, message: 'Could not get result', errMsg: err })
             else if(!resultFound) res.status(400).json({ success: 0, message: 'Result not exist!' })
             else res.json({ success: 1, message: 'Success!', result: resultFound });
