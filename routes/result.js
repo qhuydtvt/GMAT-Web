@@ -1,33 +1,33 @@
 const express = require('express');
 const router = express.Router();
 
-const QuestionPack = require('../models/questionPack.model');
+const Result = require('../models/testResult.model');
 
 router.get('/', (req, res)=>{
-    QuestionPack.find({}, (err, questionPacks)=>{
-        if(err) res.status(500).json({ success: 0, message: 'Could not get list question pack!', errMsg: err })
-        else res.json({ success: 1, message: 'Success!', questionPacks: questionPacks });
+    Result.find({}, (err, results)=>{
+        if(err) res.status(500).json({ success: 0, message: 'Could not get list result!', errMsg: err })
+        else res.json({ success: 1, message: 'Success!', results: results });
     })
 });
 
 router.get('/:id', (req, res)=>{
     if(req.params.id) {
         let id = req.params.id;
-        QuestionPack.findById(id).populate('questions', `stimulus stem type difficulty choices rightChoice`).exec((err, questionPackFound) => {
-            if(err) res.status(500).json({ success: 0, message: 'Could not get question pack', errMsg: err })
-            else if(!questionPackFound) res.status(400).json({ success: 0, message: 'Question pack not exist!' })
-            else res.json({ success: 1, message: 'Success!', questionPack: questionPackFound });
+        Result.findById(id).populate('questionPack', 'name').populate('answers.question').exec((err, resultFound) => {
+            if(err) res.status(500).json({ success: 0, message: 'Could not get result', errMsg: err })
+            else if(!resultFound) res.status(400).json({ success: 0, message: 'Result not exist!' })
+            else res.json({ success: 1, message: 'Success!', result: resultFound });
         });
     } else {
-        res.status(400).json({ success: 0, message: 'You must provide question pack id!' });
+        res.status(400).json({ success: 0, message: 'You must provide result id!' });
     }
 });
 
 router.post('/', (req, res)=>{
-    let newQuestionPack = req.body;
-    QuestionPack.create(newQuestionPack, (err, questionPackCreated)=>{
-        if(err) res.status(500).json({ success: 0, message: 'Could not create question pack!', errMsg: err })
-        else if(questionPackCreated) res.status(201).json({ success: 1, message: 'Create success!', questionPack: questionPackCreated });
+    let newResult = req.body;
+    Result.create(newResult, (err, resultCreated)=>{
+        if(err) res.status(500).json({ success: 0, message: 'Could not create result!', errMsg: err })
+        else if(resultCreated) res.status(201).json({ success: 1, message: 'Create success!', result: resultCreated });
     });
 });
 
@@ -35,45 +35,45 @@ router.put('/:id', (req, res)=>{
     if(req.params.id) {
         let id = req.params.id;
         let body = req.body;
-        QuestionPack.findById(id, (err, questionPackFound) => {
-            if(err) res.status(500).json({ success: 0, message: 'Could not get question pack!', errMsg: err })
-            else if(!questionPackFound) res.status(400).json({ success: 0, message: 'Question pack not exist!' })
+        Result.findById(id, (err, resultFound) => {
+            if(err) res.status(500).json({ success: 0, message: 'Could not get result!', errMsg: err })
+            else if(!resultFound) res.status(400).json({ success: 0, message: 'Result not exist!' })
             else {
                 for(key in body) {
                     switch(key) {
                         case '_id':
                             break;
                         default:
-                            if(questionPackFound[key]) questionPackFound[key] = body[key];
+                            if(resultFound[key]) resultFound[key] = body[key];
                             break;
                     }
                 }
-                questionPackFound.save((err, questionPackUpdated)=>{
-                    if(err) res.status(500).json({ success: 0, message: 'Could not update question pack!', errMsg: err })
-                    else res.json({ success: 1, message: 'Update success!', questionPack: questionPackUpdated });
+                resultFound.save((err, resultUpdated)=>{
+                    if(err) res.status(500).json({ success: 0, message: 'Could not update result!', errMsg: err })
+                    else res.json({ success: 1, message: 'Update success!', result: resultUpdated });
                 });
             }
         });
     } else {
-        res.status(400).json({ success: 0, message: 'You must provide question pack id!' });
+        res.status(400).json({ success: 0, message: 'You must provide result id!' });
     }
 });
 
 router.delete('/:id', (req, res)=>{
     if(req.params.id) {
         let id = req.params.id;
-        QuestionPack.findById(id, (err, questionPackFound) => {
-            if(err) res.status(500).json({ success: 0, message: 'Could not get question pack!', errMsg: err })
-            else if(!questionPackFound) res.status(400).json({ success: 0, message: 'Question pack not exist!' })
+        Result.findById(id, (err, resultFound) => {
+            if(err) res.status(500).json({ success: 0, message: 'Could not get result!', errMsg: err })
+            else if(!resultFound) res.status(400).json({ success: 0, message: 'Eesult not exist!' })
             else {
-                questionPackFound.remove({ _id: id }, (err)=>{
-                    if(err) res.status(500).json({ success: 0, message: 'Could not remove question pack!', errMsg: err })
+                resultFound.remove({ _id: id }, (err)=>{
+                    if(err) res.status(500).json({ success: 0, message: 'Could not remove result!', errMsg: err })
                     else res.json({ success: 1, message: 'Remove success!' });
                 });
             }
         });
     } else {
-        res.status(400).json({ success: 0, message: 'You must provide question pack id!' });
+        res.status(400).json({ success: 0, message: 'You must provide result id!' });
     }
 });
 
