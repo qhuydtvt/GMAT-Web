@@ -24,7 +24,10 @@ router.get('/:id', (req, res)=>{
 });
 
 router.post('/', (req, res)=>{
-    let newResult = req.body;
+    let newResult = {
+        ...req.body,
+        student: req.user.id
+    };
     Result.create(newResult, (err, resultCreated)=>{
         if(err) res.status(500).json({ success: 0, message: 'Could not create result!', errMsg: err })
         else if(resultCreated) res.status(201).json({ success: 1, message: 'Create success!', result: resultCreated });
