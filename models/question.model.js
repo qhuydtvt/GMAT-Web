@@ -20,7 +20,7 @@ let QuestionSchema = new Schema({
             rightChoice: { type: Number, default: 0 },
             difficulty: { type: Number, default: 0 },
             explanation: { type: String, default: '' },
-            highlight: { type: String, default: null }
+            highlightStimulus: { type: String, default: null }
         }
     ]
 }, {
