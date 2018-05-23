@@ -15,7 +15,7 @@ let QuestionSchema = new Schema({
                     { type: String, default: '' },
                     { type: String, default: '' }
                 ],
-                validate: [arrayLimit, '{PATH} exceeds the length of 5']
+                validate: [validArrayLength, "{PATH}'s length must be 5"]
             },
             rightChoice: { type: Number, default: 0 },
             difficulty: { type: Number, default: 0 },
@@ -27,8 +27,8 @@ let QuestionSchema = new Schema({
     timestamps: true
 });
 
-function arrayLimit(val) {
-    return val.length != 5;
+function validArrayLength(val) {
+    return val.length == 5;
 }
 
 module.exports = mongoose.model("Question", QuestionSchema);
