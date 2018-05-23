@@ -5,7 +5,11 @@ const Question = require('../models/question.model');
 const QuestionPack = require('../models/questionPack.model');
 
 router.get('/', (req, res)=>{
-    Question.find({}, (err, questions)=>{
+    const searchTerms = req.query.searchTerms ? req.query.searchTerms : "";
+    Question.find({
+      stimulus: {
+        $regex: new RegExp(searchTerms, "i")
+      }}, (err, questions)=>{
         if(err) res.status(500).json({ success: 0, message: 'Could not get list question!', errMsg: err })
         else res.json({ success: 1, message: 'Success!', questions: questions });
     })

@@ -180,7 +180,12 @@ const checkPermission = (req, res, next) => {
         });
     } else {
         let urlPath = req.url.slice(1);
-        let apiModule = urlPath.indexOf('/') > -1 ? urlPath.slice(0, urlPath.indexOf('/')) : urlPath;
+        const removeAfter = (url, part) => {
+          return url.indexOf(part) > -1 ? url.slice(0, url.indexOf(part)) : url;
+        }
+
+        let apiModule = removeAfter(urlPath, "/");
+        apiModule = removeAfter(apiModule, "?");
         var userRoleLevel;
         switch(req.user.role) {
             case "lecture":
