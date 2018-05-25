@@ -4,6 +4,8 @@ const router = express.Router();
 const Student = require('../models/student.model');
 const User = require('../models/user.model');
 
+const mongoose = require('mongoose');
+
 router.get('/', (req, res) => {
   Student
   .find({ isDisabled: false })
@@ -36,14 +38,53 @@ router.post('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   const id = req.params.id;
-  Student.findOne({_id: id}, (err, foundStudent) => {
+
+  Student.aggregate([
+    {
+      '$match': {'_id' : mongoose.Types.ObjectId(id)}
+    }, 
+    {
+      '$lookup': {
+        'from': 'classrooms',
+        'localField': '_id',
+        'foreignField': 'students',
+        'as': 'classrooms'
+      }
+    }, 
+    {
+      '$project': {
+        "_id": 1,
+        "histories": 1,
+        "isDisabled": 1,
+        "info": 1,
+        "createdAt": 1,
+        "updatedAt": 1,
+        "classroom": {'$arrayElemAt': ['$classrooms', 1]},
+      }
+    },
+    {
+      '$project': {
+        "_id": 1,
+        "histories": 1,
+        "isDisabled": 1,
+        "info": 1,
+        "createdAt": 1,
+        "updatedAt": 1,
+        "classroom._id": 1,
+        "classroom.name": 1,
+        "classroom.questionPacks": 1,
+        "classroom.createdAt": 1,
+        "classroom.updatedAt": 1,
+      }
+    }
+  ]).exec((err, foundStudent) => {
     if(err || !foundStudent) {
-      res.status(500).json({ success: 0, message: "Could not find user" });
+      res.status(500).json({ success: 0, message: "Could not find user", err });
     } else {
-      res.json({ success: 1, message: "Found user", foundStudent });
+      res.json({ success: 1, message: "Found user", foundStudent: foundStudent[0] });
     }
   });
-})
+});
 
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
