@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const mongoose = require('mongoose');
+
 const Classroom = require('../models/classroom.model');
 
 router.get('/', (req, res)=>{
@@ -14,13 +16,66 @@ router.get('/:id', (req, res)=>{
     if(req.params.id) {
         let id = req.params.id;
         Classroom
-            .findById(id)
-            .populate('students')
-            .populate('questionPacks')
-            .exec((err, classroomFound) => {
+            .aggregate([
+                {
+                    '$match': {"_id": mongoose.Types.ObjectId(id)}
+                },
+                {
+                    '$lookup': {
+                        'from': 'students', 
+                        'localField': 'students', 
+                        'foreignField': '_id', 
+                        'as': 'students'
+                    }
+                },
+                {
+                    '$unwind': '$students'
+                },
+                {
+                    '$lookup': {
+                        'from': 'users', 
+                        'localField': 'students.info', 
+                        'foreignField': '_id', 
+                        'as': 'students.info'
+                    }
+                },
+                {
+                    '$unwind': '$students.info'
+                },
+                {
+                    '$lookup': {
+                        'from': 'questionpacks', 
+                        'localField': 'questionPacks', 
+                        'foreignField': '_id', 
+                        'as': 'questionPacks'
+                    }
+                },
+                {
+                    '$group': {
+                        '_id': {
+                            '_id': '$_id',
+                            'questionPacks': '$questionPacks',
+                            'name': '$name',
+                            'createdAt': '$createdAt',
+                            'updatedAt': '$updatedAt',
+                        },
+                        'students': {'$push': '$students'}
+                    }
+                },
+                {
+                    '$project': {
+                        '_id': '$_id._id',
+                        'questionPacks': '$_id.questionPacks',
+                        'name': '$_id.name',
+                        'createdAt': '$_id.createdAt',
+                        'updatedAt': '$_id.updatedAt',
+                        'students': 1
+                    }
+                }
+            ]).exec((err, classroomFound) => {
                 if(err) res.status(500).json({ success: 0, message: 'Could not get classroom', errMsg: err })
                 else if(!classroomFound) res.status(400).json({ success: 0, message: 'Classroom not exist!' })
-                else res.json({ success: 1, message: 'Success!', classroom: classroomFound });
+                else res.json({ success: 1, message: 'Success!', classroom: classroomFound[0] });
             });
     } else {
         res.status(400).json({ success: 0, message: 'You must provide classroom id!' });
