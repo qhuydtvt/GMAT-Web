@@ -4,6 +4,8 @@ const hash = require('../../helpers/hash');
 const settings = require('../../settings');
 const UserModel = require('../../models/user.model');
 
+const mongoose = require('mongoose');
+
 const signUp =  (req, res) => {
     const body = req.body;
     const masterPassword = body.masterPassword;
@@ -124,6 +126,34 @@ const signIn = (req, res) => {
     }
 };
 
+const changePassword = (req, res) => {
+    var { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        res.status(401).json({success: 0, message: "currentPassword and newPassword required"});
+    } else {
+        UserModel.findOne({"_id": req.user.id}, (err, foundUser) => {
+            if (err || !foundUser) {
+                res.status(500).json({success: 0, message: "change password failed, unable to find user.", err});
+            } else {
+                if(!hash.compareHash(currentPassword, foundUser.hashPassword)) {
+                    res.status(500).json({success: 0, message: "Wrong old password"});
+                } else {
+                    foundUser.hashPassword = hash.generateHash(newPassword);
+    
+                    foundUser.save((error) => {
+                        if (error) {
+                            res.status(500).json({success: 0, message: "Unable to connect to server to save new password", error});
+                        } else {
+                            res.status(200).json({success: 1, message: "Changed password ok"});
+                        }
+                    });
+                }
+            }
+        });
+    }
+}
+
 const isAuthenticated = (req, res, next) => {
     const body = req.body;
     const token = body.token || req.headers.token || req.cookies.token || null;
@@ -198,6 +228,7 @@ const checkPermission = (req, res, next) => {
                 userRoleLevel = 0;
                 break;
         };
+
         if(Object.keys(settings.permission).indexOf(apiModule) > -1) {
             if(settings.permission[apiModule][req.method] <= userRoleLevel) {
                 next();
@@ -219,6 +250,7 @@ const checkPermission = (req, res, next) => {
 module.exports = {
     signUp,
     signIn,
+    changePassword,
     isAuthenticated,
     checkPermission
 };

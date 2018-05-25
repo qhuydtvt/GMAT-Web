@@ -18,6 +18,8 @@ router.post('/signin', auth.signIn);
 
 router.use(auth.isAuthenticated);
 
+router.post('/change-password', auth.changePassword);
+
 router.use(auth.checkPermission);
 
 router.post('/auth', (req, res) => {
