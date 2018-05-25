@@ -33,6 +33,17 @@ router.post('/', (req, res) => {
   });
 })
 
+router.get('/:id', (req, res) => {
+  const id = req.params.id;
+  Student.findOne({_id: id}, (err, foundStudent) => {
+    if(err || !foundStudent) {
+      res.status(500).json({ success: 0, message: "Could not find user" });
+    } else {
+      res.json({ success: 1, message: "Found user", foundStudent });
+    }
+  });
+})
+
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
   Student.findByIdAndUpdate(id, { isDisabled: true }, (err, studentBefore) => {
