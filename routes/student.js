@@ -7,20 +7,61 @@ const User = require('../models/user.model');
 const mongoose = require('mongoose');
 
 router.get('/', (req, res) => {
-  Student
-  .find({ isDisabled: false })
-  .populate('info')
-  .exec((err, students) => {
-      if(err) res.status(500).json({ success: 0, message: 'Could not get list students!', errMsg: err })
-      else res.json({ success: 1, message: 'Success!', students });
+  var name = req.query.name;
+
+  var regexToSearchName = name ? `${name}` : "";
+  
+  User.aggregate([
+    {
+      '$match':  {
+        'searchName' : {
+          '$regex' : regexToSearchName, "$options" : "i"
+        },
+        'role': 'student'
+      }
+    },
+    {
+      '$lookup': {
+        'from': 'students',
+        'localField': '_id',
+        'foreignField': 'info',
+        'as': 'studentData'
+      }
+    },
+    {
+      '$unwind': '$studentData'
+    },
+    {
+      '$match': {'studentData.isDisabled': false}
+    },
+    {
+      '$project': {
+        "_id": "$studentData._id",
+        "histories": "$studentData.histories",
+        "info.role": "$role",
+        "info.username": "$username",
+        "info.firstName": "$firstName",
+        "info.lastName": "$lastName",
+        "info.email": "$email",
+      }
+    }
+  ]).exec((err, students) => {
+    if (err) {
+      res.status(500).json({ success: 0, message: 'Could not get list students!', errMsg: err })
+    } else {
+      res.json({ success: 1, message: 'Get ok!', students });
+    }
   });
-})
+});
 
 router.post('/', (req, res) => {
   var student = req.body;
+
   student.role = "student";
   student.username = student.email;
   student.password = student.email;
+  
+
   User.upsert(student, (err, addedUser) => {
     if(err || !addedUser) {
       res.status(500).json({ success: 0, message: "Could not add user linked to this student", errMsg: err});

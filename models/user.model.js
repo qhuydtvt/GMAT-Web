@@ -1,9 +1,10 @@
-const generateHash = require('../helpers/hash').generateHash
+const { hash, getUnicodeText } = require('../helpers');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
     username: { type: String, required: true, unique: true },
+    searchName: String,
     firstName: { type: String },
     lastName: { type: String },
     hashPassword: { type: String, required: true },
@@ -18,7 +19,8 @@ UserSchema.statics.upsert = function(data, done) {
     username: data.username,
     firstName: data.firstName,
     lastName: data.lastName,
-    hashPassword: generateHash(data.password),
+    searchName: getUnicodeText(`${data.lastName} ${data.firstName}`),
+    hashPassword: hash.generateHash(data.password),
     role: data.role,
     email: data.email
   });
@@ -26,5 +28,7 @@ UserSchema.statics.upsert = function(data, done) {
     done(err, addedUser);
   });
 }
+
+UserSchema.index({searchName: "text"});
 
 module.exports = mongoose.model("User", UserSchema);
