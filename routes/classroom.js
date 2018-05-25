@@ -16,7 +16,7 @@ router.get('/:id', (req, res)=>{
         Classroom
             .findById(id)
             .populate('students')
-            .populate('lectures')
+            .populate('questionPacks')
             .exec((err, classroomFound) => {
                 if(err) res.status(500).json({ success: 0, message: 'Could not get classroom', errMsg: err })
                 else if(!classroomFound) res.status(400).json({ success: 0, message: 'Classroom not exist!' })
