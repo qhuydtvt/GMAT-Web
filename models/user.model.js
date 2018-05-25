@@ -4,6 +4,8 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
     username: { type: String, required: true, unique: true },
+    firstName: { type: String },
+    lastName: { type: String },
     hashPassword: { type: String, required: true },
     role: { type: String, required: true, default: 'student' },
     email: { type: String }
@@ -14,6 +16,8 @@ const UserSchema = new Schema({
 UserSchema.statics.upsert = function(data, done) {
   const newUser = this({
     username: data.username,
+    firstName: data.firstName,
+    lastName: data.lastName,
     hashPassword: generateHash(data.password),
     role: data.role,
     email: data.email

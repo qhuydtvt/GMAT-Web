@@ -17,7 +17,8 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   var student = req.body;
   student.role = "student";
-  student.password = student.username;
+  student.username = student.email;
+  student.password = student.email;
   User.upsert(student, (err, addedUser) => {
     if(err || !addedUser) {
       res.status(500).json({ success: 0, message: "Could not add user linked to this student", errMsg: err});
