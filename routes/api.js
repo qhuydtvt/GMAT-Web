@@ -6,6 +6,7 @@ const questionRouter = require('./question');
 const questionPackRouter = require('./questionPack');
 const classroomRouter = require('./classroom');
 const resultRouter = require('./result');
+const studentRouter = require('./student');
 
 router.get('/', (req, res) => {
     res.json({success: 1, message: "Api Router"});
@@ -35,8 +36,6 @@ router.use('/classrooms', classroomRouter);
 
 router.use('/results', resultRouter);
 
-router.get('/users/:id', (req, res)=>{
-    res.json({success: 1, message: "Students api"});
-});
+router.use('/students', studentRouter);
 
 module.exports = router;

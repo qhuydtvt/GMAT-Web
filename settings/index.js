@@ -24,6 +24,12 @@ module.exports = {
             PUT: '2',
             POST: '1',
             DELETE: '2'
-        }
+        },
+        students: {
+          GET: '2',
+          PUT: '2',
+          POST: '2',
+          DELETE: '2'
+      },
     }
 }
