@@ -16,7 +16,7 @@ router.get('/:id', (req, res)=>{
         Result
           .findById(id)
           .populate('questionPack', 'name')
-          .populate('answers.question', 'difficulty choices type rightChoice')
+          .populate('answers.question', 'difficulty choices type rightChoice explanation')
           .exec((err, resultFound) => {
             if(err) res.status(500).json({ success: 0, message: 'Could not get result', errMsg: err })
             else if(!resultFound) res.status(400).json({ success: 0, message: 'Result not exist!' })
