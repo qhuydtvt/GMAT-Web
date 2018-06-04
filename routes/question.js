@@ -7,10 +7,20 @@ const QuestionPack = require('../models/questionPack.model');
 router.get('/', (req, res)=>{
     const searchTerms = req.query.searchTerms ? req.query.searchTerms : "";
     Question.find({
-      stimulus: {
-        $regex: new RegExp(searchTerms, "i")
-      }}, (err, questions)=>{
-        if(err) res.status(500).json({ success: 0, message: 'Could not get list question!', errMsg: err })
+        '$or': [{
+                    'stimulus': {
+                        $regex: new RegExp(searchTerms, "i")
+                    }
+                },
+                {
+                    'details.stem': {
+                        $regex: new RegExp(searchTerms, "i")
+                    } 
+                }
+        ]
+        
+    }, (err, questions) => {
+        if (err) res.status(500).json({ success: 0, message: 'Could not get list question!', errMsg: err });
         else res.json({ success: 1, message: 'Success!', questions: questions });
     })
 });
