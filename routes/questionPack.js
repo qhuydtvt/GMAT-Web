@@ -4,10 +4,15 @@ const router = express.Router();
 const QuestionPack = require('../models/questionPack.model');
 
 router.get('/', (req, res)=>{
-    QuestionPack.find({}, (err, questionPacks)=>{
-        if(err) res.status(500).json({ success: 0, message: 'Could not get list question pack!', errMsg: err })
-        else res.json({ success: 1, message: 'Success!', questionPacks: questionPacks });
-    })
+    const showType = req.query.showType === "true";
+    let query = QuestionPack.find({});
+    if(!!showType) {
+      query = query.populate("questions", "type");
+    }
+    query.exec((err, questionPacks) => {
+      if(err) res.status(500).json({ success: 0, message: 'Could not get list question pack!', errMsg: err })
+      else res.json({ success: 1, message: 'Success!', questionPacks: questionPacks });
+    });
 });
 
 router.get('/:id', (req, res)=>{
