@@ -4,14 +4,50 @@ const router = express.Router();
 const QuestionPack = require('../models/questionPack.model');
 
 router.get('/', (req, res)=>{
-    const showType = req.query.showType === "true";
-    let query = QuestionPack.find({});
-    if(!!showType) {
-      query = query.populate("questions", "type");
-    }
-    query.exec((err, questionPacks) => {
-      if(err) res.status(500).json({ success: 0, message: 'Could not get list question pack!', errMsg: err })
-      else res.json({ success: 1, message: 'Success!', questionPacks: questionPacks });
+    QuestionPack.aggregate([
+        {
+            '$lookup': {
+                "from": "questions",
+                "localField": "questions",
+                "foreignField": "_id",
+                "as": "questions"
+            }
+        }, 
+        {
+            '$project': {
+                "_id": 1,
+                "questions._id": 1,
+                "questions.type": 1,
+                "name": 1,
+                "header": 1,
+            }
+        },
+        {
+            '$unwind': '$questions'
+        },
+        {
+            '$group': {
+                '_id': {
+                   "_id": '$_id',
+                   "name": '$name',
+                   "header": '$header',
+                },
+                'types': { '$addToSet': '$questions.type' },
+                'questions': { '$addToSet': '$questions._id' }
+            }
+        },
+        {
+            '$project': {
+                '_id': '$_id._id',
+                'name': '$_id.name',
+                'header': '$_id.header',
+                'questions': 1,
+                'types': 1,
+            }
+        }
+    ]).exec((err, questionPacks) => {
+        if (err) res.status(500).json({ success: 0, message: 'Could not get list question pack!', errMsg: err })
+        else res.json({ success: 1, message: 'Success!', questionPacks: questionPacks });
     });
 });
 
