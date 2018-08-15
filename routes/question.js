@@ -46,13 +46,18 @@ router.post('/', (req, res)=>{
     });
 });
 
-router.post('/checkstem', (req, res)=>{
-    let stem = req.body.stem;
-    Question.findOne({ 'details.stem' : stem }, (err, questionFound) => {
-        if(err) res.status(500).json({ success: 0, message: 'Could not get question', errMsg: err })
-        else if(questionFound) res.json({ success: 1, message: 'Question already exist!' })
-        else res.send({ success: 1, message: '' });
+router.post('/checkstems', (req, res)=>{
+    let stems = req.body.stems;
+    let details = stems.map(async stem => {
+        try {
+            let questionFound = await Question.findOne({ 'details.stem' : stem });
+            if(questionFound) return 'Question already exist!';
+            else return null;
+        } catch (error) {
+            return res.status(500).json({ success: 0, details: [], errMsg: error });
+        }
     });
+    return res.send({ success: 1, details });
 });
 
 router.put('/:id', (req, res)=>{
