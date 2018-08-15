@@ -46,6 +46,14 @@ router.post('/', (req, res)=>{
     });
 });
 
+router.post('/checkstem', (req, res)=>{
+    let stem = req.body.stem;
+    Question.findOne({ 'details.stem' : stem }, (err, questionFound) => {
+        if(err) res.status(500).json({ success: 0, message: 'Could not get question', errMsg: err })
+        else if(questionFound) res.json({ success: 1, message: 'Question already exist!' })
+        else res.send({ success: 1 });
+});
+
 router.put('/:id', (req, res)=>{
     if(req.params.id) {
         let id = req.params.id;
