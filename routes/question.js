@@ -51,12 +51,14 @@ router.post('/checkstems', (req, res)=>{
     let details = stems.map(async stem => {
         try {
             let questionFound = await Question.findOne({ 'details.stem' : stem });
+            console.log(questionFound)
             if(questionFound) return 'Question already exist!';
             else return null;
         } catch (error) {
             return res.status(500).json({ success: 0, details: [], errMsg: error });
         }
     });
+    console.log(details)
     return res.send({ success: 1, details });
 });
 
