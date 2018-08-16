@@ -50,7 +50,7 @@ router.post('/checkstems', (req, res)=>{
     let questions = req.body.questions;
     let details = [];
     questions.forEach((question, index) => {
-        Question.findOne({ 'details.stem' : question.stem, 'type': questions.type })
+        Question.findOne({ 'details.stem' : question.stem, type: questions.type })
             .then(questionFound => {
                 if(questionFound) details[index] = ('Question already exist!');
                 else details[index] = (null);
