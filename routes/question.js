@@ -52,8 +52,8 @@ router.post('/checkstems', (req, res)=>{
     stems.forEach(async (stem, index) => {
         try {
             let questionFound = await Question.findOne({ 'details.stem' : stem });
-            if(questionFound) details.push('Question already exist!');
-            else details.push(null);
+            if(questionFound) details[index] = ('Question already exist!');
+            else details[index] = (null);
             if(details.length == stems.length) {
                 return res.send({ success: 1, details });
             }
