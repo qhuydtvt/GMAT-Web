@@ -46,23 +46,17 @@ router.post('/', (req, res)=>{
     });
 });
 
-router.post('/checkstems', (req, res)=>{
+router.post('/checkstems', async (req, res)=>{
     let questions = req.body.questions;
     let details = [];
-    questions.forEach(async (question, index) => {
-        await Question.findOne({ 'details.stem' : question.stem, type: questions.type })
-            .then(questionFound => {
-                if(questionFound) details[index] = ('Question already exist!');
-                else details[index] = (null);
-                
-                if(details.length == stems.length) {
-                    return res.send({ success: 1, details });
-                }
-            })
-            .catch(error => {
-                return res.status(500).json({ success: 0, details: [], errMsg: error });
-            });
-    });
+    for(let i = 0; i < questions.length; i++) {
+        let questionFound = await Question.findOne({ 'details.stem' : question.stem, type: questions.type });
+        if(questionFound) details[i] = ('Question already exist!');
+        else details[i] = (null);
+        if(details.length == stems.length) {
+            return res.send({ success: 1, details });
+        }
+    }
 });
 
 router.put('/:id', (req, res)=>{
