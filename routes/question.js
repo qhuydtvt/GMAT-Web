@@ -49,13 +49,19 @@ router.post('/', (req, res)=>{
 router.post('/checkstems', async (req, res)=>{
     let questions = req.body.questions;
     let details = [];
-    for(let i = 0; i < questions.length; i++) {
-        let questionFound = await Question.findOne({ 'details.stem' : question.stem, type: questions.type });
-        if(questionFound) details[i] = ('Question already exist!');
-        else details[i] = (null);
-        if(details.length == questions.length) {
-            return res.send({ success: 1, details });
+    try {
+        for(let i = 0; i < questions.length; i++) {
+            let questionFound = await Question.findOne({ 'details.stem' : question.stem, 'type': questions.type });
+            if(questionFound) details[i] = ('Question already exist!');
+            else {
+                details[i] = (null)
+            };
+            if(details.length == questions.length) {
+                return res.send({ success: 1, details });
+            }
         }
+    } catch (error) {
+        console.log("Error: ", error);
     }
 });
 
