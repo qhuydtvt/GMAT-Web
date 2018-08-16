@@ -51,7 +51,7 @@ router.post('/checkstems', async (req, res)=>{
     let details = [];
     try {
         for(let i = 0; i < questions.length; i++) {
-            let questionFound = await Question.findOne({ 'details.stem' : question.stem, 'type': questions.type });
+            let questionFound = await Question.findOne({ 'details.stem' : questions[i].stem, 'type': questions[i].type });
             if(questionFound) details[i] = ('Question already exist!');
             else {
                 details[i] = (null)
